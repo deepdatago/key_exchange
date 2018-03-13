@@ -35,13 +35,16 @@ public class test {
     	// KeyManager keyManager = new KeyManagerImpl();
     	
     	String privKeyFileName = "/tmp/privatekey.pem";
-    	String certificateFileName = "/tmp/certificate.pem";
-    	keyManager.generateKeyCertificate(privKeyFileName, certificateFileName);
+    	String publicKeyFileName = "/tmp/publickey.pem";
+    	// String certificateFileName = "/tmp/certificate.pem";
+    	// keyManager.generateKeyCertificate(privKeyFileName, publicKeyFileName, certificateFileName);
+    	keyManager.generateKeyCertificate(privKeyFileName, publicKeyFileName, null);
     	PrivateKey privateKey = null;
     	PublicKey publicKey = null;
 		try {
 			privateKey = keyManager.loadPrivateKeyFromRSAPEM(privKeyFileName);
-	    	publicKey = keyManager.loadPublicKeyFromRSA_X509_CertificatePEM(certificateFileName);
+			publicKey = keyManager.loadPublicKeyFromRSAPEM(publicKeyFileName);
+	    	// publicKey = keyManager.loadPublicKeyFromRSA_X509_CertificatePEM(certificateFileName);
 		} catch (NoSuchProviderException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -51,6 +54,10 @@ public class test {
 			e1.printStackTrace();
 			return;
 		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return;
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return;

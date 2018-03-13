@@ -1,19 +1,22 @@
 package key_exchange;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 
 public interface KeyManager {
 	/**
 	 * Generate PrivateKey and Certificate 
 	 *
 	 * @param  privKeyFileName  output file name of private key 
-	 * @param  certFileName output file name of certificate
+	 * @param  publicKeyFileName  output file name of public key 
+	 * @param  certFileName output file name of certificate, could be null
 	 * @return      None
 	 */	
-	public void generateKeyCertificate(String privKeyFileName, String certFileName);
+	public void generateKeyCertificate(String privKeyFileName, String publicKeyFileName, String certFileName);
 	
 	/**
 	 * Generate public key from a RSA X.509 certificate file 
@@ -32,6 +35,19 @@ public interface KeyManager {
 	 */		
 	public PrivateKey loadPrivateKeyFromRSAPEM(String privateKeyFileName) 
 			throws IOException, NoSuchProviderException, NoSuchAlgorithmException;
+	
+	/**
+	 * Generate public key from a RSA public key PEM file
+	 *
+	 * @param  fileName  input file name of a public key 
+	 * @return      PublicKey
+	 */		
+	public PublicKey loadPublicKeyFromRSAPEM(String fileName) throws
+		FileNotFoundException,
+		IOException,
+		NoSuchAlgorithmException,
+		NoSuchProviderException,
+		InvalidKeySpecException;
 	
 	/**
 	 * Encrypt a byte[] with given public key, and encode it with Base64

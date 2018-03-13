@@ -24,6 +24,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
@@ -50,6 +51,7 @@ public class KeyManagerImpl implements KeyManager {
 	private final int certExpireInDays; // 365
 	private final String signatureAlg; // signatureAlgorithm "SHA256withRSA"
 	private final String privateKeyDescription = "RSA PRIVATE KEY";
+	private final String publicKeyDescription = "RSA PUBLIC KEY";
 	private final String certificateDescription = "CERTIFICATE";
 	private final String providerName = "BC"; // for bouncy castle
 	private final String commonName; // "CN=KeyManagerTest"
@@ -75,15 +77,17 @@ public class KeyManagerImpl implements KeyManager {
     	Security.addProvider(new BouncyCastleProvider());
     	fixAESKeyLength();
 	}
-	public void generateKeyCertificate(String privKeyFileName, String certFileName) {
+	public void generateKeyCertificate(String privKeyFileName, String publicKeyFileName, String certFileName) {
     	KeyPair keyPair;
     	PrivateKey privateKey;
-    	// PublicKey publicKey;
+    	PublicKey publicKey;
     	
 		try {
 			keyPair = generateKeyPair(this.algorithm, this.keySize);
 			privateKey = keyPair.getPrivate();
+			publicKey = keyPair.getPublic();
 			writePemFile(privateKey.getEncoded(), this.privateKeyDescription, privKeyFileName);
+			writePemFile(publicKey.getEncoded(), this.publicKeyDescription, publicKeyFileName);
 			
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -93,6 +97,9 @@ public class KeyManagerImpl implements KeyManager {
 			return;
 		}
 		
+		if (certFileName == null)
+			return;
+		
     	ContentSigner sigGen;
 		try {
 			sigGen = new JcaContentSignerBuilder(this.signatureAlg).setProvider(this.providerName).build(privateKey);
@@ -100,7 +107,7 @@ public class KeyManagerImpl implements KeyManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
-		} 
+		}
 
     	SubjectPublicKeyInfo subPubKeyInfo = SubjectPublicKeyInfo.getInstance(keyPair.getPublic().getEncoded());
     	 
@@ -129,6 +136,30 @@ public class KeyManagerImpl implements KeyManager {
 		}
 	}
 
+	public PublicKey loadPublicKeyFromRSAPEM(String fileName) 
+		throws FileNotFoundException,
+		IOException,
+		NoSuchAlgorithmException,
+		NoSuchProviderException,
+		InvalidKeySpecException
+	{
+    	String instanceName = "RSA";
+    	PEMParser pemParser = null;
+    	PemObject pemObject = null;
+    	KeyFactory factory = null;
+		File privateKeyFile = new File(fileName);
+		pemParser = new PEMParser(new FileReader(privateKeyFile));
+		pemObject = pemParser.readPemObject();
+    	factory = KeyFactory.getInstance(instanceName, this.providerName);
+		pemParser.close();
+
+		byte[] content = pemObject.getContent();
+	    X509EncodedKeySpec privKeySpec =
+	  	      new X509EncodedKeySpec(content);
+		
+		return factory.generatePublic(privKeySpec);
+	}
+    
 	public PublicKey loadPublicKeyFromRSA_X509_CertificatePEM(String fileName)
 			throws IOException, NoSuchProviderException, NoSuchAlgorithmException {
     	X509Certificate certificate = null;
