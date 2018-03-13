@@ -7,6 +7,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -23,6 +26,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Map;
 
 import javax.crypto.Cipher;
 
@@ -60,6 +64,7 @@ public class KeyManagerImpl implements KeyManager {
 		this.certExpireInDays = certExpireInDays;
 		this.commonName = commonName;
     	Security.addProvider(new BouncyCastleProvider());
+    	fixAESKeyLength();
 	}
 	public KeyManagerImpl() {
 		this.algorithm = "RSA";
@@ -68,6 +73,7 @@ public class KeyManagerImpl implements KeyManager {
 		this.certExpireInDays = 365;
 		this.commonName = "CN=KeyManagerTest";
     	Security.addProvider(new BouncyCastleProvider());
+    	fixAESKeyLength();
 	}
 	public void generateKeyCertificate(String privKeyFileName, String certFileName) {
     	KeyPair keyPair;
@@ -202,4 +208,41 @@ public class KeyManagerImpl implements KeyManager {
 		return keyGen.genKeyPair();
 	}
 	
+    public static void fixAESKeyLength() {
+        String errorString = "Failed manually overriding key-length permissions.";
+        int newMaxKeyLength;
+        try {
+            if ((newMaxKeyLength = Cipher.getMaxAllowedKeyLength("AES")) < 256) {
+                Class c = Class.forName("javax.crypto.CryptoAllPermissionCollection");
+                Constructor con = c.getDeclaredConstructor(null);
+                con.setAccessible(true);
+                Object allPermissionCollection = con.newInstance(null);
+                Field f = c.getDeclaredField("all_allowed");
+                f.setAccessible(true);
+                f.setBoolean(allPermissionCollection, true);
+
+                c = Class.forName("javax.crypto.CryptoPermissions");
+                con = c.getDeclaredConstructor(null);
+                con.setAccessible(true);
+                Object allPermissions = con.newInstance(null);
+                f = c.getDeclaredField("perms");
+                f.setAccessible(true);
+                ((Map) f.get(allPermissions)).put("*", allPermissionCollection);
+
+                c = Class.forName("javax.crypto.JceSecurityManager");
+                f = c.getDeclaredField("defaultPolicy");
+                f.setAccessible(true);
+                Field mf = Field.class.getDeclaredField("modifiers");
+                mf.setAccessible(true);
+                mf.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+                f.set(null, allPermissions);
+
+                newMaxKeyLength = Cipher.getMaxAllowedKeyLength("AES");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(errorString, e);
+        }
+        if (newMaxKeyLength < 256)
+            throw new RuntimeException(errorString); // hack failed
+    }	
 }
