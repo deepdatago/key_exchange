@@ -14,6 +14,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.Signature;
+import java.util.Base64;
 
 public class test {
     public static void main(String[] args) {
@@ -38,7 +40,7 @@ public class test {
     	String publicKeyFileName = "/tmp/publickey.pem";
     	// String certificateFileName = "/tmp/certificate.pem";
     	// keyManager.generateKeyCertificate(privKeyFileName, publicKeyFileName, certificateFileName);
-    	keyManager.generateKeyCertificate(privKeyFileName, publicKeyFileName, null);
+    	// keyManager.generateKeyCertificate(privKeyFileName, publicKeyFileName, null);
     	PrivateKey privateKey = null;
     	PublicKey publicKey = null;
 		try {
@@ -64,6 +66,15 @@ public class test {
 		}
     	String plainText = "MY PLAIN TEXT";
     	String encryptedBase64Str;
+    	try {
+    		String myStr = "P5Mj8RoEE/LgiMRxmMXgjaf8Hfwo4J+Qd6DxJDgeIVV7JpY3YRMlD616R2IRtWleLDEicqGp/6OeW1viY3sVw/ScQZ8eIeq9rWY+q63HyeMmInT7ttcdsfLglJMk8i0qkEmEZXsNS01C8lMib9sLE+DYTJv87l2ZHkpWxdM0qqfsRUc2W9XlbSlQMkcMvEiNMru6i37V1Xixd8McqPpIulVYrHOLOVHMWfZFKWSJkuHq6fh1WPMTV4hdBcbM+u9g7KQt+43epq2zoVFw7EOAGja5wcGbVg1Kngcq8Zt1Qk0pLEcZIcnQuh6C0lcOalrvEtMrgY5KVcozVNlinRdhR66HzoqgS6eN7HF0vc4pzTzz8awJgxP47KoWFRfSwp+8as0C+k1eYKR1xpW+oAzne+FqfYW0F17Gee+VzGVkIFg82Hy9tiypwF/ngxKXywsDgXiS0y8cletOGyVN3Wf8z2EVYNNO4omDJSuTCIRfOZkHiSCCq10bNwIdhTpiU5DqwMDrxOhR6dInJvcO6Tuc/KBcp0yz726NlRaK/dtP6LU6pr8a3mug8N+QMh0VLTUT3FQzu/fQIfy3oEcvWOPK3hwkE8X3lXY+jXVD8pRIdwYv6WPSqvELp6mKaPIdG5trgDjMuvRRKVk51AosqrDonI9+v1a0XsEGqf8sxivdgd8=";
+    		String decryptedStr = keyManager.decryptTextBase64(myStr.getBytes(), privateKey);
+    		System.out.println("Decrypted text: " + decryptedStr);
+    	    
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+    	}    	
     	
     	try {
     		encryptedBase64Str = keyManager.encryptTextBase64(plainText.getBytes(), publicKey);
@@ -144,7 +155,28 @@ public class test {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        System.out.println("decrypted:" + new String(decryptedPlainText));    	
+        System.out.println("decrypted:" + new String(decryptedPlainText)); 
+        
+        // sign data
+        try
+        {
+	        byte[] data = "012345678901234567890123456789012345678901234567890123456789".getBytes();
+	
+	        Signature sig = Signature.getInstance(signatureAlg);
+	        sig.initSign(privateKey);
+	        sig.update(data);
+	        byte[] signatureBytes = sig.sign();
+	        String encodedSignature = new String(Base64.getEncoder().encode(signatureBytes));
+	        System.out.println("Signature:" + encodedSignature);
+	
+	        sig.initVerify(publicKey);
+	        sig.update(data);
+	        byte[] sigBytesToVerify = Base64.getDecoder().decode(encodedSignature);
+	        System.out.println(sig.verify(sigBytesToVerify));
+        } catch (Exception e)
+        {
+        	e.printStackTrace();
+        }
     }
 
 }
