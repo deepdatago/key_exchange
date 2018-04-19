@@ -66,6 +66,7 @@ public class test {
 		}
     	String plainText = "MY PLAIN TEXT";
     	String encryptedBase64Str;
+    	/*
     	try {
     		String myStr = "P5Mj8RoEE/LgiMRxmMXgjaf8Hfwo4J+Qd6DxJDgeIVV7JpY3YRMlD616R2IRtWleLDEicqGp/6OeW1viY3sVw/ScQZ8eIeq9rWY+q63HyeMmInT7ttcdsfLglJMk8i0qkEmEZXsNS01C8lMib9sLE+DYTJv87l2ZHkpWxdM0qqfsRUc2W9XlbSlQMkcMvEiNMru6i37V1Xixd8McqPpIulVYrHOLOVHMWfZFKWSJkuHq6fh1WPMTV4hdBcbM+u9g7KQt+43epq2zoVFw7EOAGja5wcGbVg1Kngcq8Zt1Qk0pLEcZIcnQuh6C0lcOalrvEtMrgY5KVcozVNlinRdhR66HzoqgS6eN7HF0vc4pzTzz8awJgxP47KoWFRfSwp+8as0C+k1eYKR1xpW+oAzne+FqfYW0F17Gee+VzGVkIFg82Hy9tiypwF/ngxKXywsDgXiS0y8cletOGyVN3Wf8z2EVYNNO4omDJSuTCIRfOZkHiSCCq10bNwIdhTpiU5DqwMDrxOhR6dInJvcO6Tuc/KBcp0yz726NlRaK/dtP6LU6pr8a3mug8N+QMh0VLTUT3FQzu/fQIfy3oEcvWOPK3hwkE8X3lXY+jXVD8pRIdwYv6WPSqvELp6mKaPIdG5trgDjMuvRRKVk51AosqrDonI9+v1a0XsEGqf8sxivdgd8=";
     		String decryptedStr = keyManager.decryptTextBase64(myStr.getBytes(), privateKey);
@@ -75,7 +76,7 @@ public class test {
 			e.printStackTrace();
 		} finally {
     	}    	
-    	
+    	*/
     	try {
     		encryptedBase64Str = keyManager.encryptTextBase64(plainText.getBytes(), publicKey);
     		System.out.println("Encrypted text: " + encryptedBase64Str);
@@ -87,7 +88,7 @@ public class test {
 		} finally {
     	}    	
     	
-    	String myKey = "12345678901234567890123456789012";
+    	String myKey = "5d8324e83dc14336914152775d1bb757";
     	SecretKeySpec key = new SecretKeySpec(myKey.getBytes(), "AES");
 
         Cipher cipher = null;
@@ -129,7 +130,7 @@ public class test {
 			e.printStackTrace();
 		}
 		String encodedEncryptedStr = new String(Base64.getEncoder().encode(cipherText));
-		System.out.println(encodedEncryptedStr);
+		System.out.println("encrypted string: " + encodedEncryptedStr);
         // System.out.println(new String(cipherText));
         // System.out.println(ctLength);
 
@@ -138,13 +139,13 @@ public class test {
         int ptLength = 0;
         try {
 			cipher.init(Cipher.DECRYPT_MODE, key);
+			/*
 	        decryptedPlainText = new byte[cipher.getOutputSize(ctLength)];
 	        ptLength = cipher.update(Base64.getDecoder().decode(encodedEncryptedStr), 0, ctLength, decryptedPlainText, 0);
 	        ptLength += cipher.doFinal(decryptedPlainText, ptLength);
+	        */
+			decryptedPlainText = cipher.doFinal(Base64.getDecoder().decode(encodedEncryptedStr));
 		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ShortBufferException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (BadPaddingException e)
