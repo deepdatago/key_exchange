@@ -1,6 +1,11 @@
 package key_exchange;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -191,6 +196,80 @@ public class test {
         keyManager.decryptFileWithSymmetricKey(myKey, outputFileName, decryptedFileName);
         System.out.println("done decryption\n");
         */
+        
+        /*
+        // test encrypt input stream
+        System.out.println("start encryption\n");
+        String inputFileName = "/tmp/mini.jpg";
+        FileInputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(inputFileName);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        InputStream encryptedInputStream = null;
+        encryptedInputStream = keyManager.encryptInputStreamWithSymmetricKey(myKey, inputStream);
+        System.out.println("done encryption\n");
+        OutputStream os = null;
+        String encryptedFileName = "/tmp/out.jpg";
+        try {
+			os = new FileOutputStream(encryptedFileName);
+	        byte[] buffer = new byte[4096];
+	        int bytesRead;
+	        while((bytesRead = encryptedInputStream.read(buffer)) !=-1){
+	            os.write(buffer, 0, bytesRead);
+	        }
+	        encryptedInputStream.close();
+	        //flush OutputStream to write any buffered data to file
+	        os.flush();
+	        os.close();        
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        System.out.println("start decryption\n");
+        String decryptedFileName = "/tmp/output_dec.jpg";
+        keyManager.decryptFileWithSymmetricKey(myKey, encryptedFileName, decryptedFileName);
+        System.out.println("done decryption\n");
+        */
+
+        /*
+         // test decrypt input stream
+        System.out.println("start encryption\n");
+        String inputFileName = "/tmp/mini.jpg";
+        FileInputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(inputFileName);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        InputStream encryptedInputStream = null;
+        encryptedInputStream = keyManager.encryptInputStreamWithSymmetricKey(myKey, inputStream);
+        System.out.println("done encryption\n");
+        
+        InputStream decryptedInputStream = keyManager.decryptInputStreamWithSymmetricKey(myKey,  encryptedInputStream);
+        OutputStream os = null;
+        String encryptedFileName = "/tmp/out.jpg";
+        try {
+			os = new FileOutputStream(encryptedFileName);
+	        byte[] buffer = new byte[4096];
+	        int bytesRead;
+	        while((bytesRead = decryptedInputStream.read(buffer)) !=-1){
+	            os.write(buffer, 0, bytesRead);
+	        }
+	        encryptedInputStream.close();
+	        decryptedInputStream.close();
+	        //flush OutputStream to write any buffered data to file
+	        os.flush();
+	        os.close();        
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        System.out.println("done decryption\n");   
+        */     
     }
 
 }

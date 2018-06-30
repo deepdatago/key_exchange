@@ -1,11 +1,15 @@
 package key_exchange;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -321,5 +325,41 @@ public class KeyManagerImpl implements KeyManager {
         }
         if (newMaxKeyLength < 256)
             throw new RuntimeException(errorString); // hack failed
-    }	
+    }
+    
+	public InputStream encryptInputStreamWithSymmetricKey(String inKey, InputStream inputStream) {
+		return doCryptoStream(Cipher.ENCRYPT_MODE, inKey, inputStream);
+	}
+
+	public InputStream decryptInputStreamWithSymmetricKey(String inKey, InputStream inputStream) {
+		return doCryptoStream(Cipher.DECRYPT_MODE, inKey, inputStream);
+	}
+
+	public InputStream doCryptoStream(int cipherMode, String inKey, InputStream inputStream) {
+        try {
+        	SecretKeySpec key = new SecretKeySpec(inKey.getBytes(), "AES");
+        	Cipher cipher = Cipher.getInstance("AES/ECB/PKCS7Padding", "BC");
+            cipher.init(cipherMode, key);
+             
+            // FileInputStream inputStream = new FileInputStream(inputFile);
+            int inputLength = inputStream.available();
+            byte[] inputBytes = new byte[inputLength];
+            inputStream.read(inputBytes);
+             
+            byte[] outputBytes = cipher.doFinal(inputBytes);
+             
+            // FileOutputStream outputStream = new FileOutputStream(outputFile);
+            // outputStream.write(outputBytes);
+            InputStream cipherInputStream = new ByteArrayInputStream(outputBytes);
+             
+            // inputStream.close();
+            // outputStream.close();
+            return cipherInputStream;
+             
+        } catch (Exception e) {
+            e.printStackTrace();;
+        }	
+        return null;
+	}
+
 }

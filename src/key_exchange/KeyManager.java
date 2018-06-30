@@ -1,6 +1,8 @@
 package key_exchange;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -73,7 +75,7 @@ public interface KeyManager {
 	 * @param  inKey symmetric key that is used to encrypt the given byte[]
 	 * @param  inputFileName input file name, which needs to be encrypted
 	 * @param  outputFileName output file name, which needs to be written to
-	 * @return      Base64 encoded string of the encrypted data
+	 * @return      None
 	 */
 	public void encryptFileWithSymmetricKey(String inKey, String inputFileName, String outFileName);
 
@@ -83,8 +85,25 @@ public interface KeyManager {
 	 * @param  inKey symmetric key that is used to decrypt the given byte[]
 	 * @param  inputFileName input file name, which needs to be decrypted
 	 * @param  outputFileName output file name, which needs to be written to
-	 * @return      Plain text string of the decrypted data
+	 * @return      None
 	 */
 	public void decryptFileWithSymmetricKey(String inKey, String inputFileName, String outputFileName);
-    
+
+	/**
+	 * Encrypt input stream with given symmetric key
+	 *
+	 * @param  inKey symmetric key that is used to encrypt the given byte[]
+	 * @param  inputStream input stream, which needs to be encrypted
+	 * @return      Cipherized input stream
+	 */
+	public InputStream encryptInputStreamWithSymmetricKey(String inKey, InputStream inputStream);
+	
+	/**
+	 * Decrypt input stream with given symmetric key
+	 *
+	 * @param  inKey symmetric key that is used to encrypt the given byte[]
+	 * @param  inputStream input stream, which needs to be decrypted
+	 * @return      Decrypted input stream
+	 */
+	public InputStream decryptInputStreamWithSymmetricKey(String inKey, InputStream inputStream);
 }
