@@ -66,4 +66,25 @@ public interface KeyManager {
 	 * @return      Plain text of the encrypted byte[]
 	 */	    
     public String decryptTextBase64(byte[] text, PrivateKey key) throws Exception;
+    
+	/**
+	 * Encrypt a string with given symmetric key
+	 *
+	 * @param  inKey symmetric key that is used to encrypt the given byte[]
+	 * @param  inputFileName input file name, which needs to be encrypted
+	 * @param  outputFileName output file name, which needs to be written to
+	 * @return      Base64 encoded string of the encrypted data
+	 */
+	public void encryptFileWithSymmetricKey(String inKey, String inputFileName, String outFileName);
+
+	/**
+	 * Decrypt a string with given symmetric key
+	 *
+	 * @param  inKey symmetric key that is used to decrypt the given byte[]
+	 * @param  inputFileName input file name, which needs to be decrypted
+	 * @param  outputFileName output file name, which needs to be written to
+	 * @return      Plain text string of the decrypted data
+	 */
+	public void decryptFileWithSymmetricKey(String inKey, String inputFileName, String outputFileName);
+    
 }

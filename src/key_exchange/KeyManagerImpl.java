@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.Map;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -226,7 +227,52 @@ public class KeyManagerImpl implements KeyManager {
 
     }
     
-    private void writePemFile(byte[] encodedBytes, String description, String filename) throws IOException {
+	public void encryptFileWithSymmetricKey(String inKey, String inputFileName, String outputFileName) {
+		try {
+			File inputFile = new File(inputFileName);
+			File outputFile = new File(outputFileName);
+			doCrypto(Cipher.ENCRYPT_MODE, inKey, inputFile, outputFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void decryptFileWithSymmetricKey(String inKey, String inputFileName, String outputFileName) {
+		try {
+			File inputFile = new File(inputFileName);
+			File outputFile = new File(outputFileName);
+			doCrypto(Cipher.DECRYPT_MODE, inKey, inputFile, outputFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+    private void doCrypto(int cipherMode, String inKey, File inputFile,
+            File outputFile) throws Exception {
+        try {
+        	SecretKeySpec key = new SecretKeySpec(inKey.getBytes(), "AES");
+        	Cipher cipher = Cipher.getInstance("AES/ECB/PKCS7Padding", "BC");
+            cipher.init(cipherMode, key);
+             
+            FileInputStream inputStream = new FileInputStream(inputFile);
+            byte[] inputBytes = new byte[(int) inputFile.length()];
+            inputStream.read(inputBytes);
+             
+            byte[] outputBytes = cipher.doFinal(inputBytes);
+             
+            FileOutputStream outputStream = new FileOutputStream(outputFile);
+            outputStream.write(outputBytes);
+             
+            inputStream.close();
+            outputStream.close();
+             
+        } catch (Exception e) {
+            throw e;
+        }
+    }	
+
+	private void writePemFile(byte[] encodedBytes, String description, String filename) throws IOException {
     	PemObject pemObject = new PemObject(description, encodedBytes);
 		PemWriter pemWriter = null;
 		pemWriter = new PemWriter(new OutputStreamWriter(new FileOutputStream(filename)));

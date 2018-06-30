@@ -38,9 +38,9 @@ public class test {
     	
     	String privKeyFileName = "/tmp/privatekey.pem";
     	String publicKeyFileName = "/tmp/publickey.pem";
-    	// String certificateFileName = "/tmp/certificate.pem";
-    	// keyManager.generateKeyCertificate(privKeyFileName, publicKeyFileName, certificateFileName);
-    	// keyManager.generateKeyCertificate(privKeyFileName, publicKeyFileName, null);
+    	String certificateFileName = "/tmp/certificate.pem";
+    	keyManager.generateKeyCertificate(privKeyFileName, publicKeyFileName, certificateFileName);
+    	keyManager.generateKeyCertificate(privKeyFileName, publicKeyFileName, null);
     	PrivateKey privateKey = null;
     	PublicKey publicKey = null;
 		try {
@@ -178,6 +178,19 @@ public class test {
         {
         	e.printStackTrace();
         }
+        
+        /*
+        String inputFileName = "/tmp/astrill-setup-mac.dmg";
+        String outputFileName = "/tmp/astrill-setup-mac_enc.dmg";
+        System.out.println("start encryption\n");
+        keyManager.encryptFileWithSymmetricKey(myKey, inputFileName, outputFileName);
+        System.out.println("done encryption\n");
+
+        System.out.println("start decryption\n");
+        String decryptedFileName = "/tmp/astrill-setup-mac_dec.dmg";
+        keyManager.decryptFileWithSymmetricKey(myKey, outputFileName, decryptedFileName);
+        System.out.println("done decryption\n");
+        */
     }
 
 }
